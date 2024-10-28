@@ -1,33 +1,35 @@
-import Link from "next/link";
-import {PrismaClient} from "@prisma/client";
-import safeJsonStringify from 'safe-json-stringify';
-import {useUser} from "@auth0/nextjs-auth0/client";
+import { gql, useQuery } from '@apollo/client'
+import type { Item } from '@prisma/client'
 
-
-export async function getServerSideProps() {
-    const prisma = new PrismaClient();
-    const users = await prisma.user.findMany();
-    return {
-        props: {
-            users: safeJsonStringify(users),
-        },
-    };
-}
+const AllItemsQuery = gql`
+    query {
+        items {
+            id
+            title
+            description
+            price
+            imageUrl
+        }
+    }
+`
 
 const Home = ({ users }: any) => {
-    const { user } = useUser();
-    console.log('session', user, users);
+    const { data, loading, error } = useQuery(AllItemsQuery)
+
+    if (loading) return <p>Loading...</p>
+    if (error) return <p>Oh no... {error.message}</p>
+
     return (
         <div>
-            {user ? (
-                <div>
-                    <p>
-                        Welcome {user.name}! <Link href="/api/auth/logout">Logout</Link>
-                    </p>
+            <h1>Home</h1>
+            {data.items.map((item: Item) => (
+                <div key={item.id}>
+                    <h2>{item.title}</h2>
+                    <p>{item.description}</p>
+                    <p>{item.price}</p>
+                    <img src={item.imageUrl} alt={item.title} />
                 </div>
-            ) : (
-                <Link href="/api/auth/login">Login</Link>
-            )}
+            ))}
         </div>
     );
 };
