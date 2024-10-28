@@ -1,6 +1,31 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+interface SupabaseOptions {
+    global?: {
+        headers: {
+            Authorization: string
+        }
+    }
+}
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const getSupabase = (access_token?: string): SupabaseClient => {
+    const options: SupabaseOptions = {}
+
+    if (access_token) {
+        options.global = {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        }
+    }
+
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
+        options
+    )
+
+    return supabase
+}
+
+export { getSupabase }
