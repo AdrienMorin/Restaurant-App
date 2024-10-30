@@ -19,6 +19,10 @@ const AdminPage: React.FC = () => {
         try {
             await addTable();
             refetch();
+            toast({
+                title: "Éxito",
+                description: "Mesa agregada exitosamente.",
+            });
         } catch (e) {
             toast({
                 title: "Error",
