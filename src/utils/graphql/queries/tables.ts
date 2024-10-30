@@ -8,3 +8,24 @@ query Tables {
     }
 }
 `;
+
+export const GET_TABLE_BY_ID = gql`
+    query GetTableById($id: ID!) {
+        getTableById(id: $id) {
+            id
+            number
+            orders {
+                id
+                createdAt
+                status
+                item {
+                    id
+                    title
+                    description
+                    price
+                    imageUrl
+                }
+            }
+        }
+    }
+`;
