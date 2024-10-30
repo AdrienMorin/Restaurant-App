@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import type { Item } from "@prisma/client";
 import ItemCard from "@/molecules/itemCard";
 import { Undo2 } from "lucide-react";
+import { Toaster } from "@/components/ui/toaster";
 
 const AllItemsQuery = gql`
   query {
@@ -19,7 +20,7 @@ const AllItemsQuery = gql`
 const Menu = () => {
   const { data, loading, error } = useQuery(AllItemsQuery);
   const router = useRouter();
-  const { tableID } = router.query;
+  const { tableId } = router.query;
 
   if (loading) return <p className="text-center text-gray-600">Cargando...</p>;
   if (error) return <p className="text-center text-red-600">Oh no... {error.message}</p>;
@@ -35,9 +36,10 @@ const Menu = () => {
       <h1 className="text-5xl font-bold text-center text-orange-800 mb-10">Nuestro Menú</h1>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {data.items.map((item: Item) => (
-          <ItemCard key={item.id} item={item} tableID={tableID} />
+          <ItemCard key={item.id} item={item} tableId={tableId} />
         ))}
       </div>
+      <Toaster />
     </div>
   );
 };
