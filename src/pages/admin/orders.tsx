@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import useMiddleware from "@/lib/middleware";
 import { toast } from "@/hooks/use-toast";
 import dayjs from "dayjs"; // Add dayjs for date formatting
-import { Order } from "@prisma/client";
 import AdminLayout from "../_layout";
 
 // GraphQL query to fetch relevant orders
@@ -29,6 +28,29 @@ const GET_ORDERS_QUERY = gql`
     }
   }
 `;
+
+interface Order {
+    id: string;
+    createdAt: string; // This will be a timestamp string, e.g., "1730321701922"
+    status: "PENDING" | "PREPARING" | "READY" | "DELIVERED" | "PAID" | "CANCELLED";
+    table: {
+      id: string;
+      number: number;
+    } | null;
+    item: {
+      id: string;
+      title: string;
+      description?: string;
+      price: number;
+      imageUrl?: string;
+    } | null;
+    payment: {
+      id: string;
+      createdAt: string;
+      type: "CASH" | "CARD" | "OTHER";
+    } | null;
+  }
+  
 
 // GraphQL mutation to update order status
 const SET_ORDER_STATUS_MUTATION = gql`
@@ -68,7 +90,7 @@ const OrdersPage: React.FC = () => {
     ["PENDING", "PREPARING", "READY"].includes(order.status)
   );
 
-  const ordersByTable = filteredOrders.reduce((acc, order) => {
+  const ordersByTable = filteredOrders.reduce((acc: { [tableNumber: string]: typeof filteredOrders }, order: Order) => {
     const tableNumber = order.table?.number ?? "N/A";
     if (!acc[tableNumber]) acc[tableNumber] = [];
     acc[tableNumber].push(order);
