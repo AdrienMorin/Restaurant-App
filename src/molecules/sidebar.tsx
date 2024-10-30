@@ -1,5 +1,3 @@
-import {CircleDollarSign, HandPlatter, MapPinned, Utensils} from "lucide-react"
-
 import {
     Sidebar,
     SidebarContent, SidebarFooter,
@@ -11,37 +9,25 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {useUser} from "@auth0/nextjs-auth0/client";
-import Image from "next/image";
 import React from "react";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
+import {useRouter} from "next/router";
 
-// Menu items.
-const items = [
-    {
-        title: "Gestión del menú",
-        url: "/admin",
-        icon: Utensils,
-    },
-    {
-        title: "Gestión de pagos",
-        url: "/admin/payments",
-        icon: CircleDollarSign,
-    },
-    {
-        title: "Órdenes",
-        url: "/admin/orders",
-        icon: HandPlatter,
-    },
-    {
-        title: "Gestión de mesas",
-        url: "/admin/tables",
-        icon: MapPinned,
-    },
-]
+interface SidebarItemProps {
+    title: string;
+    url: string;
+    icon: React.FC;
+}
 
-export function AppSidebar() {
+interface SidebarProps {
+    items: SidebarItemProps[];
+    withFooter?: boolean;
+}
+
+export function AppSidebar( { props }: {props: SidebarProps} ) {
     const { user } = useUser();
+    const router = useRouter();
     return (
         <Sidebar>
             <SidebarContent>
@@ -49,9 +35,9 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {props.items.map((item: SidebarItemProps) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
+                                    <SidebarMenuButton isActive={router.pathname === item.url} asChild>
                                         <a href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
@@ -63,14 +49,16 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className={"mb-4"}>
-                <div className={"flex flex-row gap-6 items-center justify-center"}>
-                    {user?.picture && <img alt="profile" className="rounded-full w-12 h-12 mr-4" height={48} width={48}
-                         src={user.picture}/>}
-                    <p className={"mx-auto"}>{user?.name}</p>
-                </div>
-                <Button asChild><Link href={`/api/auth/logout?returnTo=http://localhost:3000/api/auth/login`}>Logout</Link></Button>
-            </SidebarFooter>
+            { props.withFooter &&
+                <SidebarFooter className={"mb-4"}>
+                    <div className={"flex flex-row gap-6 items-center justify-center"}>
+                        {user?.picture && <img alt="profile" className="rounded-full w-12 h-12 mr-4" height={48} width={48}
+                             src={user.picture}/>}
+                        <p className={"mx-auto"}>{user?.name}</p>
+                    </div>
+                    <Button asChild><Link href={`/api/auth/logout?returnTo=http://localhost:3000/api/auth/login`}>Logout</Link></Button>
+                </SidebarFooter>
+            }
         </Sidebar>
     )
 }
