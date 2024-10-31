@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {Check, Plus} from "lucide-react";
+import {Check} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@apollo/client";
 import { EDIT_ITEM_MUTATION } from "@/utils/graphql/mutations/items";
 import { useRouter } from "next/router";
+import {ItemProps} from "@/utils/interfaces";
 
 const FormSchema = z.object({
     price: z.string().nonempty({
@@ -34,15 +35,6 @@ const FormSchema = z.object({
         message: "La URL de la imagen no es válida",
     }),
 });
-
-interface ItemProps {
-    id: number,
-    title: string,
-    description: string,
-    imageUrl: string,
-    price: number
-}
-
 
 export function ItemEditForm({ item }: { item: ItemProps }) {
     const form = useForm<z.infer<typeof FormSchema>>({

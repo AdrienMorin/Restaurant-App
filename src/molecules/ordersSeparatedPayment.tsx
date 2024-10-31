@@ -8,21 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CREATE_PAYMENT_FOR_ORDER_MUTATION } from "@/utils/graphql/mutations/payments";
 import { useMutation } from "@apollo/client";
 import { toast } from "@/hooks/use-toast";
-
-interface OrderProps {
-    id: number;
-    createdAt: string;
-    status: string;
-    item: ItemProps;
-}
-
-interface ItemProps {
-    id: number;
-    title: string;
-    description: string;
-    imageUrl: string;
-    price: number;
-}
+import {OrderProps} from "@/utils/interfaces";
+import {PaymentType} from "@/utils/enums";
 
 interface OrdersTableProps {
     orders: OrderProps[];
@@ -34,12 +21,6 @@ const FormSchema = z.object({
         message: "El tipo de pago no puede estar vacío",
     }),
 });
-
-enum PaymentType {
-    CASH = "CASH",
-    CARD = "CARD",
-    OTHER = "OTHER",
-}
 
 interface OrderPaymentFormProps {
     orderId: number;

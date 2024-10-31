@@ -1,23 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import type { Item } from "@prisma/client";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { toast } from "@/hooks/use-toast";
-
-interface ItemCardProps {
-  item: Item;
-  tableId?: string | string[];
-}
-
-const CREATE_ORDER_MUTATION = gql`
-  mutation CreateOrder($tableId: ID!, $itemId: ID!, $paymentId: ID) {
-    createOrder(tableId: $tableId, itemId: $itemId, paymentId: $paymentId) {
-      id
-      status
-      createdAt
-    }
-  }
-`;
-
+import {CREATE_ORDER_MUTATION} from "@/utils/graphql/mutations/orders";
+import {ItemCardProps} from "@/utils/interfaces";
+import {Button} from "@/components/ui/button";
 
 export default function ItemCard({ item, tableId }: ItemCardProps) {
   const [createOrder, { loading }] = useMutation(CREATE_ORDER_MUTATION);
@@ -65,15 +51,14 @@ export default function ItemCard({ item, tableId }: ItemCardProps) {
       <CardContent className="p-4 flex flex-col gap-4">
         <p className="text-xl font-bold text-orange-700">${item.price}</p>
         {tableId && (
-          <button
+          <Button
             onClick={handleOrderNow}
             disabled={loading}
-            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center justify-center"
           >
             {loading 
             ?  "Cargando ... "
             :  "Ordenar Ahora"}
-          </button>
+          </Button>
         )}
       </CardContent>
     </Card>
