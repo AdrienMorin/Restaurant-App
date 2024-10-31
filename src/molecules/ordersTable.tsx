@@ -6,21 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-
-interface OrderProps {
-    id: number,
-    createdAt: string,
-    status: string,
-    item: ItemProps
-}
-
-interface ItemProps {
-    id: number,
-    title: string,
-    description: string,
-    imageUrl: string,
-    price: number
-}
+import {OrderProps} from "@/utils/interfaces";
 
 interface OrdersTableProps {
     orders: OrderProps[];

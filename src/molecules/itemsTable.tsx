@@ -18,16 +18,8 @@ import {
 import {useMutation} from "@apollo/client";
 import {DELETE_ITEM_MUTATION} from "@/utils/graphql/mutations/items";
 import {toast} from "@/hooks/use-toast";
-import {useRouter} from "next/router";
 import Link from "next/link";
-
-interface ItemProps {
-    id: number,
-    title: string,
-    description: string,
-    imageUrl: string,
-    price: number
-}
+import {ItemProps} from "@/utils/interfaces";
 
 interface ItemsTableProps {
     items: ItemProps[];
@@ -36,7 +28,6 @@ interface ItemsTableProps {
 
 export function ItemsTable({ items, refetch }: ItemsTableProps) {
     const [deleteItem] = useMutation(DELETE_ITEM_MUTATION);
-    const router = useRouter();
 
     const handleDelete = async (id: number) => {
         try {

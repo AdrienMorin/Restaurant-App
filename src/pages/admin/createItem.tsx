@@ -8,7 +8,7 @@ import {Undo2} from "lucide-react";
 import {useRouter} from "next/router";
 
 
-const AdminPage: React.FC = () => {
+const CreateItemPage: React.FC = () => {
 
     useMiddleware();
 
@@ -18,7 +18,6 @@ const AdminPage: React.FC = () => {
         event.preventDefault();
         router.back();
     };
-
 
     return (
         <AdminLayout>
@@ -34,4 +33,4 @@ const AdminPage: React.FC = () => {
     );
 };
 
-export default AdminPage;
+export default CreateItemPage;

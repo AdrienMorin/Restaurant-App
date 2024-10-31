@@ -5,18 +5,7 @@ import ItemCard from "@/molecules/itemCard";
 import { Undo2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import {Button} from "@/components/ui/button";
-
-const AllItemsQuery = gql`
-  query {
-    items {
-      id
-      title
-      description
-      price
-      imageUrl
-    }
-  }
-`;
+import {AllItemsQuery} from "@/utils/graphql/queries/items";
 
 const Menu = () => {
   const { data, loading, error } = useQuery(AllItemsQuery);

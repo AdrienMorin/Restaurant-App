@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import {OrdersSeparatedPayment} from "@/molecules/ordersSeparatedPayment";
+import {PaymentType} from "@/utils/enums";
 
 const FormSchema = z.object({
     paymentType: z.enum(["CASH", "CARD", "OTHER"], {
@@ -36,12 +37,6 @@ export default function PaymentForm({ tableId }: { tableId: string }) {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     });
-
-    enum PaymentType {
-        CASH = "CASH",
-        CARD = "CARD",
-        OTHER = "OTHER"
-    }
 
     const [tablePayment, { loading }] = useMutation(CREATE_PAYMENT_FOR_TABLE_MUTATION);
 

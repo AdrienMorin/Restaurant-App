@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/molecules/sidebar";
 import {Toaster} from "@/components/ui/toaster";
-import {CircleDollarSign, HandPlatter, MapPinned, Utensils} from "lucide-react";
+import {ChartCandlestick, CircleDollarSign, HandPlatter, MapPinned, Utensils} from "lucide-react";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -28,6 +28,11 @@ const items = [
         title: "Gestión de mesas",
         url: "/admin/tables",
         icon: MapPinned,
+    },
+    {
+        title: "Análisis de datos",
+        url: "/admin/data",
+        icon: ChartCandlestick,
     },
 ]
 

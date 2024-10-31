@@ -6,63 +6,10 @@ import useMiddleware from "@/lib/middleware";
 import { toast } from "@/hooks/use-toast";
 import dayjs from "dayjs"; // Add dayjs for date formatting
 import AdminLayout from "../_layout";
+import {GET_ORDERS_QUERY} from "@/utils/graphql/queries/orders";
+import {SET_ORDER_STATUS_MUTATION} from "@/utils/graphql/mutations/orders";
+import {OrderProps} from "@/utils/interfaces";
 
-// GraphQL query to fetch relevant orders
-const GET_ORDERS_QUERY = gql`
-  query GetOrders {
-    orders {
-      id
-      createdAt
-      status
-      table {
-        id
-        number
-      }
-      item {
-        title
-        price
-      }
-      payment {
-        type
-      }
-    }
-  }
-`;
-
-interface Order {
-    id: string;
-    createdAt: string; // This will be a timestamp string, e.g., "1730321701922"
-    status: "PENDING" | "PREPARING" | "READY" | "DELIVERED" | "PAID" | "CANCELLED";
-    table: {
-      id: string;
-      number: number;
-    } | null;
-    item: {
-      id: string;
-      title: string;
-      description?: string;
-      price: number;
-      imageUrl?: string;
-    } | null;
-    payment: {
-      id: string;
-      createdAt: string;
-      type: "CASH" | "CARD" | "OTHER";
-    } | null;
-  }
-  
-
-// GraphQL mutation to update order status
-const SET_ORDER_STATUS_MUTATION = gql`
-  mutation SetOrderStatus($id: ID!, $status: OrderStatus!) {
-    setOrderStatus(id: $id, status: $status) {
-      id
-      status
-    }
-  }
-`;
-
-// Helper function to get the status color
 const getStatusColor = (status: string) => {
   switch (status) {
     case "PENDING":
@@ -86,11 +33,11 @@ const OrdersPage: React.FC = () => {
   if (error) return <p className="text-red-600">Error: {error.message}</p>;
 
   // Filter orders by status and group by table
-  const filteredOrders = data.orders.filter((order: Order) =>
+  const filteredOrders = data.orders.filter((order: OrderProps) =>
     ["PENDING", "PREPARING", "READY"].includes(order.status)
   );
 
-  const ordersByTable = filteredOrders.reduce((acc: { [tableNumber: string]: typeof filteredOrders }, order: Order) => {
+  const ordersByTable = filteredOrders.reduce((acc: { [tableNumber: string]: typeof filteredOrders }, order: OrderProps) => {
     const tableNumber = order.table?.number ?? "N/A";
     if (!acc[tableNumber]) acc[tableNumber] = [];
     acc[tableNumber].push(order);
@@ -127,7 +74,7 @@ const OrdersPage: React.FC = () => {
           <div key={tableNumber} className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Mesa {tableNumber}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ordersByTable[tableNumber].map((order: Order) => (
+              {ordersByTable[tableNumber].map((order: OrderProps) => (
                 <Card key={order.id} className="shadow-md">
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">

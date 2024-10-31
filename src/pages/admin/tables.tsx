@@ -7,6 +7,7 @@ import { GET_ALL_TABLES } from "@/utils/graphql/queries/tables";
 import TableCard from "@/molecules/tableCard";
 import { ADD_TABLE_MUTATION, REMOVE_TABLE_MUTATION } from "@/utils/graphql/mutations/tables";
 import { toast } from "@/hooks/use-toast";
+import {TableProps} from "@/utils/interfaces";
 
 const AdminPage: React.FC = () => {
     useMiddleware();
@@ -54,7 +55,7 @@ const AdminPage: React.FC = () => {
                     <Button className={"m-4"} onClick={handleAddTable}><Plus />Agregar una mesa</Button>
                     <Button className={"m-4"} variant={"destructive"} onClick={handleRemoveTable}><Minus />Quitar una mesa</Button>
                 </div>
-                {data && data.tables.map((table: any) => (
+                {data && data.tables.map((table: TableProps) => (
                     <TableCard table={table} key={table.id}></TableCard>
                 ))}
             </div>
