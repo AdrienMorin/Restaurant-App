@@ -69,7 +69,7 @@ export default function PaymentForm({ tableId }: { tableId: string }) {
     };
 
     return (
-        <Tabs defaultValue="mesa" className="w-[400px]">
+        <Tabs defaultValue="mesa" className="w-full">
             <TabsList className="flex w-full ">
                 <TabsTrigger value="mesa" className={"w-full"}>Pagar toda la mesa</TabsTrigger>
                 <TabsTrigger value="items" className={"w-full"}>Pagar separados</TabsTrigger>
