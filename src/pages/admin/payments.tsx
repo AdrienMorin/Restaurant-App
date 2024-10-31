@@ -15,7 +15,7 @@ import PaymentForm from "@/molecules/paymentForm";
 export default function PaymentsPage() {
     useMiddleware();
 
-    const { data, refetch } = useQuery(GET_ALL_TABLES);
+    const { data } = useQuery(GET_ALL_TABLES);
     const [selectedTable, setSelectedTable] = useState<string | null>(null);
 
     return (

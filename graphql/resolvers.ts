@@ -142,7 +142,7 @@ export const resolvers = {
                 data: { status: OrderStatus.CANCELLED },
             });
         },
-        createPaymentForOrder: async (_: any, { orderId, paymentType }: { orderId: string, paymentType: PaymentType }) => {
+        createPaymentForOrder: async (_: any, { type, orderId }: { type: PaymentType, orderId: string }) => {
             const order = await prisma.order.findUnique({
                 where: { id: Number(orderId) },
             });
@@ -153,7 +153,7 @@ export const resolvers = {
 
             const payment = await prisma.payment.create({
                 data: {
-                    type: paymentType,
+                    type: type,
                 },
             });
 
