@@ -1,24 +1,80 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Label} from "@/components/ui/label";
-import {Button} from "@/components/ui/button";
-import {useQuery} from "@apollo/client";
-import {GET_TABLE_BY_ID} from "@/utils/graphql/queries/tables";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_TABLE_BY_ID } from "@/utils/graphql/queries/tables";
+import { OrdersTable } from "@/molecules/ordersTable";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { CREATE_PAYMENT_FOR_TABLE_MUTATION } from "@/utils/graphql/mutations/payments";
+import { toast } from "@/hooks/use-toast";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {OrdersSeparatedPayment} from "@/molecules/ordersSeparatedPayment";
 
-export default function PaymentForm({tableId} : {tableId: string}) {
+const FormSchema = z.object({
+    paymentType: z.enum(["CASH", "CARD", "OTHER"], {
+        message: "El tipo de pago no puede estar vacío",
+    }),
+});
 
-    const {data} = useQuery(GET_TABLE_BY_ID, {
+export default function PaymentForm({ tableId }: { tableId: string }) {
+    const { data, refetch } = useQuery(GET_TABLE_BY_ID, {
         variables: { id: tableId },
         skip: !tableId,
-    })
+    });
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+    });
+
+    enum PaymentType {
+        CASH = "CASH",
+        CARD = "CARD",
+        OTHER = "OTHER"
+    }
+
+    const [tablePayment, { loading }] = useMutation(CREATE_PAYMENT_FOR_TABLE_MUTATION);
+
+    const handleTablePayment = async (data: z.infer<typeof FormSchema>) => {
+        console.log("test:", data.paymentType);
+        try {
+            await tablePayment({
+                variables: {
+                    type: data.paymentType as PaymentType,
+                    tableId: tableId,
+                }
+            });
+            toast({
+                title: "Pago realizado",
+                description: "El pago para la mesa ha sido realizado con éxito",
+            });
+            refetch();
+        } catch (e) {
+            console.error(e);
+            toast({
+                title: "Error de pago",
+                description: "El pago para la mesa no ha podido ser realizado",
+            });
+        }
+    };
 
     return (
-        <Tabs defaultValue="account" className="w-[400px]">
+        <Tabs defaultValue="mesa" className="w-[400px]">
             <TabsList className="flex w-full ">
-                <TabsTrigger value="account" className={"w-full"}>Pagar toda la mesa</TabsTrigger>
-                <TabsTrigger value="password" className={"w-full"}>Pagar separados</TabsTrigger>
+                <TabsTrigger value="mesa" className={"w-full"}>Pagar toda la mesa</TabsTrigger>
+                <TabsTrigger value="items" className={"w-full"}>Pagar separados</TabsTrigger>
             </TabsList>
-            <TabsContent value="account">
+            <TabsContent value="mesa">
                 <Card>
                     <CardHeader>
                         <CardTitle>Ordenes de la mesa</CardTitle>
@@ -27,42 +83,58 @@ export default function PaymentForm({tableId} : {tableId: string}) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                        {data?.getTableById && data.getTableById.orders.map((order: any) => (
-                            <div key={order.id} className="flex justify-between">
-                                <div>
-                                    <p>{order.item.title}</p>
-                                    <p>{order.item.price}</p>
-                                </div>
-                                <div>
-                                    <Button>Pay</Button>
-                                </div>
-                            </div>
-                        ))}
+                        <OrdersTable orders={data?.getTableById.orders} />
                     </CardContent>
                     <CardFooter>
-                        <Button>Save changes</Button>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(handleTablePayment)}>
+                                <div className={"flex"}>
+                                    <FormField
+                                        control={form.control}
+                                        name="paymentType"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Select
+                                                        value={field.value}
+                                                        onValueChange={(value) => field.onChange(value)}
+                                                    >
+                                                        <SelectTrigger className="w-[180px]">
+                                                            <SelectValue placeholder="Metodo de pago" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectGroup>
+                                                                <SelectItem value="CASH">Efectivo</SelectItem>
+                                                                <SelectItem value="CARD">Tarjeta</SelectItem>
+                                                                <SelectItem value="OTHER">Otro</SelectItem>
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <CardFooter>
+                                        <Button type="submit">{loading ? "Cargando…" : "Guardar pago"}</Button>
+                                    </CardFooter>
+                                </div>
+                            </form>
+                        </Form>
                     </CardFooter>
                 </Card>
             </TabsContent>
-            <TabsContent value="password">
+            <TabsContent value="items">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Password</CardTitle>
+                        <CardTitle>Pagar separados</CardTitle>
                         <CardDescription>
-                            Change your password here. After saving, you'll be logged out.
+                            Aquí puedes pagar las ordenes de la mesa de forma separada.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                        <div className="space-y-1">
-                            <Label htmlFor="current">Current password</Label>
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="new">New password</Label>
-                        </div>
+                        <OrdersSeparatedPayment orders={data?.getTableById.orders} refetch={refetch} />
                     </CardContent>
-                    <CardFooter>
-                        <Button>Save password</Button>
-                    </CardFooter>
                 </Card>
             </TabsContent>
         </Tabs>
