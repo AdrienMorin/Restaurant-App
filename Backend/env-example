@@ -1,0 +1,4 @@
+DATABASE_URL='postgresql://postgres.[...]@[...]:5432/postgres'
+
+SUPABASE_URL="https://[...].supabase.co"
+SUPABASE_KEY=<YOUR_SUPABASE_KEY>
