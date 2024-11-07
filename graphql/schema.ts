@@ -51,13 +51,33 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type User {
-        id: ID!
-        name: String!
-        email: String!
-        role: String!
+      id: ID!
+      name: String!
+      email: String!
+      role: Role
+      sessions: [Session!]
+  }
+
+  enum Role {
+      USER
+      ADMIN
+  }
+
+  type Session {
+      id: ID!
+      token: String!
+      userId: ID!
+      user: User!
+      expiresAt: String!
+  }
+
+  type AuthPayload {
+      token: String
+      user: User
   }
 
   type Query {
+        me: User!
         items: [Item!]!
         getItemById(id: ID!): Item
         tables: [Table!]!
@@ -66,12 +86,12 @@ export const typeDefs = /* GraphQL */ `
         getOrdersByTableId(tableId: ID!): [Order!]
         payments: [Payment!]!
         getPaymentById(id: ID!): Payment
-        me: User!
   }
 
   type Mutation {
         signup(email: String!, password: String!, name: String!): AuthPayload
         login(email: String!, password: String!): AuthPayload
+        logout: Boolean
         createItem(title: String!, description: String!, price: Float!, imageUrl: String!): Item
         deleteItem(id: ID!): Item
         editItem(id: ID!, title: String, description: String, price: Float, imageUrl: String): Item
