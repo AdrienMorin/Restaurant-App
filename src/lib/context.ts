@@ -1,7 +1,7 @@
 import { PrismaClient, User } from "@prisma/client";
-import prisma from "../lib/prisma";
-import {FastifyRequest} from "fastify";
-import {authenticateUser} from "./auth";
+import prisma from "../../lib/prisma";
+import { IncomingMessage, ServerResponse } from "http";
+import { authenticateUser } from "./auth";
 
 export type GraphQLContext = {
     prisma: PrismaClient;
@@ -9,11 +9,11 @@ export type GraphQLContext = {
 };
 
 export async function contextFactory(
-    request: FastifyRequest
+    req: IncomingMessage,
+    res: ServerResponse
 ): Promise<GraphQLContext> {
     return {
         prisma,
-        currentUser: await authenticateUser(prisma, request),
+        currentUser: await authenticateUser(prisma, req),
     };
 }
-

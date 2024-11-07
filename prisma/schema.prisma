@@ -8,11 +8,20 @@ generator client {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int       @id @default(autoincrement())
   name     String
+  email    String    @unique
   password String
-  role     Role   @default(USER)
+  role     Role      @default(USER)
+  sessions Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
 }
 
 enum Role {

@@ -1,8 +1,7 @@
 import prisma from "../lib/prisma";
-import {GraphQLContext} from "@/context";
-import {compare, hash} from "bcryptjs";
-import {sign} from "jsonwebtoken";
-import {APP_SECRET, requireAuth} from "../src/auth";
+import { GraphQLContext } from "@/lib/context";
+import {compare, genSaltSync, hash, hashSync} from "bcryptjs";
+import {logout, requireAuth} from "@/lib/auth";
 
 enum OrderStatus {
     PENDING="PENDING",
@@ -25,6 +24,33 @@ enum PaymentType {
     CARD="CARD",
     OTHER="OTHER",
 }
+
+const generateRandomKey = (length: number = 64): string => {
+    const salt = genSaltSync(10);
+    const hash = hashSync(salt, 10);
+    return hash.slice(0, length);
+};
+
+const createDateOneDayLater = (): Date => {
+    const now = new Date();
+    const oneDayLater = new Date(now);
+    oneDayLater.setDate(now.getDate() + 1);
+    return oneDayLater;
+};
+
+const createSession = async (userId: number): Promise<string> => {
+    const token = generateRandomKey(64);
+    const storedToken = await prisma.session.create({
+        data: {
+            token,
+            userId,
+            expiresAt: createDateOneDayLater(),
+        },
+        include: { user: true },
+    });
+
+    return storedToken.token;
+};
 
 export const resolvers = {
     Query: {
@@ -90,20 +116,16 @@ export const resolvers = {
             args: { email: string; password: string; name: string },
             context: GraphQLContext
         ) => {
-            // 1
             const password = await hash(args.password, 10);
 
-            // 2
             const user = await context.prisma.user.create({
                 data: { ...args, password },
             });
 
-            // 3
-            const token = sign({ userId: user.id }, APP_SECRET);
+            const sessionToken = await createSession(user.id);
 
-            // 4
             return {
-                token,
+                sessionToken,
                 user,
             };
         },
@@ -112,7 +134,6 @@ export const resolvers = {
             args: { email: string; password: string },
             context: GraphQLContext
         ) => {
-            // 1
             const user = await context.prisma.user.findUnique({
                 where: { email: args.email },
             });
@@ -120,19 +141,23 @@ export const resolvers = {
                 throw new Error("No such user found");
             }
 
-            // 2
             const valid = await compare(args.password, user.password);
             if (!valid) {
                 throw new Error("Invalid password");
             }
 
-            const token = sign({ userId: user.id }, APP_SECRET);
+            const userId = user.id;
 
-            // 3
+            const sessionToken = await createSession(userId);
+
             return {
-                token,
+                token: sessionToken,
                 user,
             };
+        },
+        logout: async (parent: unknown, args: {}, context: GraphQLContext) => {
+            await logout(context);
+            return true;
         },
         createItem: async (parent: unknown, { title, description, price, imageUrl }: { title: string, description: string, price: number, imageUrl: string }, context: GraphQLContext) => {
             requireAuth(context);
