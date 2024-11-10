@@ -1,24 +1,18 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import ItemCard from "@/molecules/itemCard";
-import {ChevronUp, Undo2} from "lucide-react";
+import {Undo2} from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { AllItemsQuery } from "@/utils/graphql/queries/items";
 import { ItemProps } from "@/utils/interfaces";
 import OrdersSideBar from "@/molecules/ordersSideBar";
+import * as React from "react";
 
 const Menu = () => {
     const { data, loading, error } = useQuery(AllItemsQuery);
     const router = useRouter();
     const { tableId } = router.query;
-    const tableIdString = Array.isArray(tableId) ? tableId[0] : tableId;
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
 
     if (loading) return <p className="text-center text-gray-600">Cargando...</p>;
     if (error) return <p className="text-center text-red-600">Oh no... {error.message}</p>;
@@ -40,14 +34,8 @@ const Menu = () => {
                     ))}
                 </div>
             </div>
-            <div className={"w-full fixed bottom-0 flex justify-center"}>
-                {tableIdString && (
-                    <Button onClick={toggleSidebar} className={"flex flex-col p-4 h-14 w-80 gap-0 justify-center items-center"}>
-                        <ChevronUp className={""}/>
-                        <p className={"text-lg"}>Ver las ordenes</p>
-                    </Button>
-                )}
-                {isSidebarOpen && tableIdString && <OrdersSideBar tableId={tableIdString} onClose={toggleSidebar}/>}
+            <div className={"w-full fixed bottom-0 flex flex-col justify-center"}>
+                {tableId && <OrdersSideBar />}
             </div>
             <Toaster/>
         </main>
