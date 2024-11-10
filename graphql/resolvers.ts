@@ -2,6 +2,7 @@ import prisma from "../lib/prisma";
 import { GraphQLContext } from "@/lib/context";
 import {compare, genSaltSync, hash, hashSync} from "bcryptjs";
 import {logout, requireAuth} from "@/lib/auth";
+import {Role} from "@/utils/enums";
 
 enum OrderStatus {
     PENDING="PENDING",
@@ -58,6 +59,16 @@ export const resolvers = {
             requireAuth(context);
             return context.currentUser;
         },
+        users: async (parent: unknown, args: {}, context: GraphQLContext) => {
+            requireAuth(context);
+            return prisma.user.findMany();
+        },
+        user: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
+            requireAuth(context);
+            return prisma.user.findUnique({
+                where: { id: Number(id) },
+            });
+        },
         items: async () => {
             return prisma.item.findMany({ orderBy: { id: 'asc' } });
         },
@@ -113,7 +124,7 @@ export const resolvers = {
     Mutation: {
         signup: async (
             parent: unknown,
-            args: { email: string; password: string; name: string },
+            args: { email: string; password: string; name: string, role: Role },
             context: GraphQLContext
         ) => {
             const password = await hash(args.password, 10);
@@ -154,6 +165,40 @@ export const resolvers = {
                 token: sessionToken,
                 user,
             };
+        },
+        updateUser: async (parent: unknown, { id, name, email, password, role }: { id: string, name?: string, email?: string, password?: string, role?: Role }, context: GraphQLContext) => {
+            requireAuth(context);
+            const data: Record<string, unknown> = {};
+            if (name) {
+                data.name = name;
+            }
+            if (email) {
+                data.email = email;
+            }
+            if (role) {
+                data.role = role;
+            }
+            if (password) {
+                data.password = await hash(password, 10);
+            }
+            return prisma.user.update({
+                where: { id: Number(id) },
+                data,
+            });
+        },
+        deleteUser: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
+            requireAuth(context);
+            return prisma.$transaction(async (prisma) => {
+                // Supprimer les sessions associées à l'utilisateur
+                await prisma.session.deleteMany({
+                    where: { userId: Number(id) },
+                });
+
+                // Supprimer l'utilisateur
+                return prisma.user.delete({
+                    where: { id: Number(id) },
+                });
+            });
         },
         logout: async (parent: unknown, args: {}, context: GraphQLContext) => {
             await logout(context);

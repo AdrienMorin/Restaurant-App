@@ -78,6 +78,8 @@ export const typeDefs = /* GraphQL */ `
 
   type Query {
         me: User!
+        users: [User!]!
+        user(id: ID!): User
         items: [Item!]!
         getItemById(id: ID!): Item
         tables: [Table!]!
@@ -89,8 +91,10 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Mutation {
-        signup(email: String!, password: String!, name: String!): AuthPayload
+        signup(email: String!, password: String!, name: String!, role: Role): AuthPayload
         login(email: String!, password: String!): AuthPayload
+        updateUser(id: ID!, name: String, email: String, password: String, role: Role): User
+        deleteUser(id: ID!): User
         logout: Boolean
         createItem(title: String!, description: String!, price: Float!, imageUrl: String!): Item
         deleteItem(id: ID!): Item

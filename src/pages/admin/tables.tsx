@@ -1,17 +1,18 @@
 import AdminLayout from "@/pages/_layout";
-import { useMutation, useQuery } from '@apollo/client';
-import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
-import { GET_ALL_TABLES } from "@/utils/graphql/queries/tables";
+import {useMutation, useQuery} from '@apollo/client';
+import {Button} from "@/components/ui/button";
+import {Minus, Plus} from "lucide-react";
+import {GET_ALL_TABLES} from "@/utils/graphql/queries/tables";
 import TableCard from "@/molecules/tableCard";
-import { ADD_TABLE_MUTATION, REMOVE_TABLE_MUTATION } from "@/utils/graphql/mutations/tables";
-import { toast } from "@/hooks/use-toast";
+import {ADD_TABLE_MUTATION, REMOVE_TABLE_MUTATION} from "@/utils/graphql/mutations/tables";
+import {toast} from "@/hooks/use-toast";
 import {TableProps} from "@/utils/interfaces";
 import useMiddleware from "@/hooks/useMiddleware";
 import IsLoading from "@/molecules/isLoading";
+import {Role} from "@/utils/enums";
 
 const AdminPage: React.FC = () => {
-    const isConnecting = useMiddleware();
+    const user = useMiddleware(Role.ADMIN);
 
     const { data, refetch } = useQuery(GET_ALL_TABLES);
     const [addTable] = useMutation(ADD_TABLE_MUTATION);
@@ -45,12 +46,12 @@ const AdminPage: React.FC = () => {
         }
     };
 
-    if (isConnecting) {
+    if (!user) {
         return <IsLoading/>;
     }
 
     return (
-        <AdminLayout>
+        <AdminLayout user={user}>
             <div className={"w-4/5 mx-auto"}>
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center mb-4">
                     Gestion de las mesas

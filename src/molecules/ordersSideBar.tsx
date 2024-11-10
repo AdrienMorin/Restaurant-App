@@ -8,7 +8,7 @@ import {Badge} from "@/components/ui/badge";
 import {getStatusColor} from "@/pages/admin/orders";
 import {states} from "@/utils/enums";
 import * as React from "react";
-import {Card, CardHeader} from "@/components/ui/card";
+import {Card} from "@/components/ui/card";
 import {ChevronDown, ChevronUp, RotateCcw, Trash2} from "lucide-react";
 import {Icons} from "@/components/ui/icons";
 import {toast} from "@/hooks/use-toast";

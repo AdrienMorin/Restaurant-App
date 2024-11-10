@@ -1,20 +1,20 @@
 import AdminLayout from "@/pages/_layout";
 import useMiddleware from "@/hooks/useMiddleware";
-import { ItemsTable } from "@/molecules/itemsTable";
+import { UsersTable } from "@/molecules/usersTable";
 import { useQuery } from '@apollo/client';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { AllItemsQuery } from "@/utils/graphql/queries/items";
+import { GET_ALL_USERS_QUERY } from "@/utils/graphql/queries/users";
 import IsLoading from "@/molecules/isLoading";
-import {Role} from "@/utils/enums";
+import { Role } from "@/utils/enums";
 
-export default function AdminPage() {
-    const user = useMiddleware(Role.USER);
+export default function AdminUsersPage() {
+    const user = useMiddleware(Role.ADMIN);
 
-    const { data, refetch } = useQuery(AllItemsQuery);
+    const { data, refetch } = useQuery(GET_ALL_USERS_QUERY);
     const router = useRouter();
     const { reload } = router.query;
 
@@ -26,21 +26,21 @@ export default function AdminPage() {
     }, [reload, router, refetch]);
 
     if (!user) {
-        return <IsLoading/>;
+        return <IsLoading />;
     }
 
     return (
         <AdminLayout user={user}>
             <div className={"w-4/5 mx-auto"}>
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center mb-4">
-                    Gestion del menu
+                    Gestion de los usuarios
                 </h1>
                 <Button className={"m-4"} asChild>
-                    <Link href={"/admin/createItem"}>
-                        <Plus />Agregar un item al menu
+                    <Link href={"/admin/createUser"}>
+                        <Plus />Agregar usuario
                     </Link>
                 </Button>
-                <ItemsTable items={data ? data.items : []} refetch={refetch} />
+                <UsersTable users={data ? data.users : []} refetch={refetch} />
             </div>
         </AdminLayout>
     );

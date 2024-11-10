@@ -1,8 +1,8 @@
-import { useQuery, useMutation } from "@apollo/client";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import {useMutation, useQuery} from "@apollo/client";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {toast} from "@/hooks/use-toast";
 import dayjs from "dayjs"; // Add dayjs for date formatting
 import AdminLayout from "../_layout";
 import {GET_ORDERS_QUERY} from "@/utils/graphql/queries/orders";
@@ -10,7 +10,7 @@ import {SET_ORDER_STATUS_MUTATION} from "@/utils/graphql/mutations/orders";
 import {OrderProps} from "@/utils/interfaces";
 import useMiddleware from "@/hooks/useMiddleware";
 import IsLoading from "@/molecules/isLoading";
-import {states} from "@/utils/enums";
+import {Role, states} from "@/utils/enums";
 
 export const getStatusColor = (status: string) => {
   switch (status) {
@@ -26,7 +26,7 @@ export const getStatusColor = (status: string) => {
 };
 
 const OrdersPage: React.FC = () => {
-  const isConnecting = useMiddleware();
+  const user = useMiddleware(Role.USER);
 
   const { data, loading, error } = useQuery(GET_ORDERS_QUERY);
   const [setOrderStatus] = useMutation(SET_ORDER_STATUS_MUTATION);
@@ -66,12 +66,12 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  if (isConnecting) {
+  if (!user) {
     return <IsLoading/>;
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout user={user}>
       <div className="p-6 md:p-10 bg-gray-50">
         <h1 className="text-3xl font-bold mb-6">Órdenes</h1>
         {Object.keys(ordersByTable).map((tableNumber) => (

@@ -9,12 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {LOGIN_MUTATION} from "@/utils/graphql/mutations/auth";
 import {useRouter} from "next/router";
+import {toast} from "@/hooks/use-toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [login, { data, error }] = useMutation(LOGIN_MUTATION);
+    const [wrongPassword, setWrongPassword] = React.useState<boolean>(false);
     const router = useRouter();
 
     async function onSubmit(event: React.SyntheticEvent) {
@@ -32,11 +34,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
             if (result.data.login) {
                 localStorage.setItem("token", result.data.login.token);
-                console.log("Logged in successfully:", result.data.login);
-                router.push('/admin');
+                await router.push('/admin');
             }
         } catch (err) {
-            console.error("Error logging in:", err);
+            toast({
+                title: "Erreur",
+                description: "Utilisateur ou mot de passe incorrect",
+            });
+            setWrongPassword(true);
+
         }
 
         setIsLoading(false);
@@ -73,6 +79,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                             disabled={isLoading}
                         />
                     </div>
+                    {
+                        wrongPassword && (
+                            <p className={"text-red-500 text-center"}>Usuario o contraseña incorrectos</p>
+                        )
+                    }
                     <Button disabled={isLoading}>
                         {isLoading && (
                             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
