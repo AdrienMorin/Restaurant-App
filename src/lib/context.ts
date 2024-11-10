@@ -9,8 +9,7 @@ export type GraphQLContext = {
 };
 
 export async function contextFactory(
-    req: IncomingMessage,
-    res: ServerResponse
+    req: IncomingMessage
 ): Promise<GraphQLContext> {
     return {
         prisma,

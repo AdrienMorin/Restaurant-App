@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 export const CREATE_PAYMENT_FOR_TABLE_MUTATION = gql`
     mutation CreatePaymentForTable($type: PaymentType!, $tableId: ID!) {

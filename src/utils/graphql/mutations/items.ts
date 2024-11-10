@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 export const CREATE_ITEM_MUTATION = gql`
     mutation CreateItem($title: String!, $description: String!, $imageUrl: String!, $price: Float!) {
