@@ -4,7 +4,7 @@ import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {toast} from "@/hooks/use-toast";
 import dayjs from "dayjs"; // Add dayjs for date formatting
-import AdminLayout from "../_layout";
+import AdminLayout from "@/layouts/_layout";
 import {GET_ORDERS_QUERY} from "@/utils/graphql/queries/orders";
 import {SET_ORDER_STATUS_MUTATION} from "@/utils/graphql/mutations/orders";
 import {OrderProps} from "@/utils/interfaces";

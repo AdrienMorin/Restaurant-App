@@ -1,7 +1,6 @@
 "use client"
 
-import AdminLayout from "@/pages/_layout";
-
+import AdminLayout from "@/layouts/_layout";
 import {useQuery} from "@apollo/client";
 import {GET_ORDERS_QUERY} from "@/utils/graphql/queries/orders";
 import {useEffect, useState} from "react";

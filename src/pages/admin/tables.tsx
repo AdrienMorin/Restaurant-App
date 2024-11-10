@@ -1,4 +1,4 @@
-import AdminLayout from "@/pages/_layout";
+import AdminLayout from "@/layouts/_layout";
 import {useMutation, useQuery} from '@apollo/client';
 import {Button} from "@/components/ui/button";
 import {Minus, Plus} from "lucide-react";

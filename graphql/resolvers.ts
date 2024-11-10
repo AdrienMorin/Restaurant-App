@@ -361,7 +361,7 @@ export const resolvers = {
 
             return prisma.table.delete({
                 where: {number: maxNumber!.number},
-            });;
+            });
         },
     },
 };

@@ -1,12 +1,13 @@
+import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/molecules/sidebar";
 import {Toaster} from "@/components/ui/toaster";
 import {ChartCandlestick, CircleDollarSign, HandPlatter, MapPinned, User, Utensils} from "lucide-react";
-import {ReactNode} from "react";
 import {Role, UserProps} from "@/utils/enums";
 
 interface AdminLayoutProps {
     children: React.ReactNode;
+    user: UserProps
 }
 
 // Menu items.
@@ -54,7 +55,7 @@ const props = {
     withFooter: true,
 }
 
-export default function AdminLayout({ children, user } : {children: ReactNode, user: UserProps}) {
+export default function AdminLayout({ children, user } : AdminLayoutProps) {
     return (
         <SidebarProvider>
             <AppSidebar props={props} user={user}/>

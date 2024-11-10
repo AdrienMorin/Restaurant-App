@@ -1,4 +1,4 @@
-import AdminLayout from "@/pages/_layout";
+import AdminLayout from "@/layouts/_layout";
 import {
     Select,
     SelectContent,

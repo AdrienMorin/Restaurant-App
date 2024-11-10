@@ -1,4 +1,4 @@
-import AdminLayout from "@/pages/_layout";
+import AdminLayout from "@/layouts/_layout";
 import useMiddleware from "@/hooks/useMiddleware";
 import { ItemsTable } from "@/molecules/itemsTable";
 import { useQuery } from '@apollo/client';

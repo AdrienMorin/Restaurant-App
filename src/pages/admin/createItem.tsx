@@ -1,6 +1,6 @@
 "use client"
 
-import AdminLayout from "@/pages/_layout";
+import AdminLayout from "@/layouts/_layout";
 import {ItemCreationForm} from "@/molecules/itemCreationForm";
 import {Button} from "@/components/ui/button";
 import {Undo2} from "lucide-react";
