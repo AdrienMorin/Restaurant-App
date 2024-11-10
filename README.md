@@ -1,40 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Restaurant Management Application
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This is a restaurant management application built with `Next.js, TypeScript, Tailwind, Prisma, GraphQL, and Supabase`. The application allows customers to view the menu and make reservations by scanning a QR code containing the table's UUID. It also includes an admin panel protected by frontend and backend authentication, where administrators can manage the menu, tables, orders, payments, users, and analyze sales with graphs and statistics of top-selling items.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Video Presentation
+
+You can watch a video presentation of the application [here](https://youtu.be/VgTNnO7MJ0g).
+
+## Features
+
+- **Customer Interface**: Customers can view the menu and make reservations by scanning a QR code.
+- **Admin Panel**: Protected by authentication, the admin panel allows managing the menu, tables, orders, payments, users, and sales analysis.
+- **Authentication**: Secured with middleware on both the frontend and backend.
+- **Database Seeding**: Includes default data for 3 menu items and 2 users.
+
+## Deployment
+
+Project deployed on Vercel: [https://adrien-morin-sebastian-ruiz-restaurant.vercel.app/](https://adrien-morin-sebastian-ruiz-restaurant.vercel.app/)
+
+## Pages of the Application
+
+- `/`: Displays the landing page.
+- `/menu`: Displays the menu.
+- `/menu?tableId=<UUID>`: Displays the menu with the possibility to order items for the given table corresponding to the unique QR Code.
+- `/admin`: Displays the admin panel.
+- `/auth/login`: Displays the login page.
+
+Note: The admin panel is protected by frontend and backend authentication. Depending on the user role, the admin panel will display different pages in the layout.
+
+
+## Environment Variables
+
+To run the project, you need to set the following environment variables:
+
+```plaintext
+DATABASE_URL="<URL_SUPABASE_POSTGRES>/postgres?pgbouncer=true"
+LOCAL_URL=http://localhost:3000
+PRODUCTION_URL=URL_PRODUCTION_VERCEL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting Started
+### Prerequisites
+Node.js and Yarn installed on your machine.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Installation
+### Clone the repository:
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+git clone <repository_url>
+cd <repository_name>
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Install the dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+yarn install
+```
 
-## Learn More
+### Prisma migration
 
-To learn more about Next.js, take a look at the following resources:
+To create the database schema, run:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```bash
+yarn prisma migrate dev --name "init"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Database Seeding
 
-## Deploy on Vercel
+To seed the database with default data (3 menu items and 2 users), run:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+yarn prisma db seed
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Default users:
+
+Email: admin@gmail.com
+
+Password: admin123
+
+Email: kitchen@gmail.com
+
+Password: kitchen123
+
+
+### Run the development server:
+
+```bash
+yarn dev
+```
+
+### Regenerate Prisma Client
+To regenerate the Prisma client, run:
+
+```bash
+yarn prisma generate
+```
+
+## Project Structure
+
+- `/src/pages`: Contains the Next.js pages.
+- `/src/pages/api/graphql`: Contains the GraphQL API running using Apollo Server v4.
+- `/src/components` & `/src/molecules`: Reusable components.
+- `/prisma`: Prisma schema and seeding scripts.
+- `/graphql`: GraphQL schema and resolvers.
+- `/utils`: Utility functions.
+- `/hooks/useMiddleware`: Custom hook for frontend authentication.
+- `/src/lib/auth`: Custom backend authentication middleware.
+- `/styles`: Global styles and CSS modules (using Tailwind for styling).
+- `/public`: Static files.
+- `/lib`: apollo and prisma clients. 
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contact
+For any questions or suggestions, please contact Adrien Morin at morinadrien71@gmail.com.
+
