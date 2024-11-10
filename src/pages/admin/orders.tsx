@@ -2,15 +2,17 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import useMiddleware from "@/lib/middleware";
 import { toast } from "@/hooks/use-toast";
 import dayjs from "dayjs"; // Add dayjs for date formatting
 import AdminLayout from "../_layout";
 import {GET_ORDERS_QUERY} from "@/utils/graphql/queries/orders";
 import {SET_ORDER_STATUS_MUTATION} from "@/utils/graphql/mutations/orders";
 import {OrderProps} from "@/utils/interfaces";
+import useMiddleware from "@/hooks/useMiddleware";
+import IsLoading from "@/molecules/isLoading";
+import {states} from "@/utils/enums";
 
-const getStatusColor = (status: string) => {
+export const getStatusColor = (status: string) => {
   switch (status) {
     case "PENDING":
       return "bg-yellow-500 text-white";
@@ -24,12 +26,12 @@ const getStatusColor = (status: string) => {
 };
 
 const OrdersPage: React.FC = () => {
-  useMiddleware();
+  const isConnecting = useMiddleware();
 
   const { data, loading, error } = useQuery(GET_ORDERS_QUERY);
   const [setOrderStatus] = useMutation(SET_ORDER_STATUS_MUTATION);
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return <IsLoading/>;
   if (error) return <p className="text-red-600">Error: {error.message}</p>;
 
   // Filter orders by status and group by table
@@ -64,7 +66,9 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const states: { [key: string]: string } = {ready: "Listo", preparing: "Preparando", delivered: "Entregado", pending: "Pendiente"}
+  if (isConnecting) {
+    return <IsLoading/>;
+  }
 
   return (
     <AdminLayout>

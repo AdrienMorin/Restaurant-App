@@ -18,3 +18,13 @@ export const SET_ORDER_STATUS_MUTATION = gql`
         }
     }
 `;
+
+export const CANCEL_ORDER_MUTATION = gql`
+    mutation CancelOrder($id: ID!) {
+        cancelOrder(id: $id) {
+            id
+            status
+        }
+    }
+`;
+

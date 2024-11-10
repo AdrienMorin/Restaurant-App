@@ -95,7 +95,7 @@ export const resolvers = {
         },
         getOrdersByTableId: async (_: any, { tableId }: { tableId: string }) => {
             return prisma.order.findMany({
-                where: { tableId },
+                where: { tableId, status: { notIn: ['PAID', 'CANCELLED'] } },
                 include: { table: true, item: true, payment: true },
             });
         },
