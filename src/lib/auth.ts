@@ -2,6 +2,7 @@ import { PrismaClient, User } from "@prisma/client";
 import {GraphQLContext} from "@/lib/context";
 import { IncomingMessage } from "http";
 import prisma from "../../lib/prisma";
+import {Role} from "@/utils/enums";
 
 
 export async function authenticateUser(prisma: PrismaClient, request: IncomingMessage): Promise<User | null> {
@@ -27,9 +28,12 @@ export async function authenticateUser(prisma: PrismaClient, request: IncomingMe
     return null;
 }
 
-export function requireAuth(context: GraphQLContext) {
+export function requireAuth(context: GraphQLContext, role: Role) {
     if (!context.currentUser) {
         throw new Error("You must be authenticated");
+    }
+    if (role === Role.ADMIN && context.currentUser.role !== Role.ADMIN) {
+        throw new Error("You must be an admin");
     }
 }
 

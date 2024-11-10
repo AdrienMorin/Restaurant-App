@@ -1,5 +1,5 @@
 import prisma from "../lib/prisma";
-import { GraphQLContext } from "@/lib/context";
+import {GraphQLContext} from "@/lib/context";
 import {compare, genSaltSync, hash, hashSync} from "bcryptjs";
 import {logout, requireAuth} from "@/lib/auth";
 import {Role} from "@/utils/enums";
@@ -56,15 +56,15 @@ const createSession = async (userId: number): Promise<string> => {
 export const resolvers = {
     Query: {
         me: (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return context.currentUser;
         },
         users: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.user.findMany();
         },
         user: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.user.findUnique({
                 where: { id: Number(id) },
             });
@@ -78,11 +78,11 @@ export const resolvers = {
             });
         },
         tables: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.table.findMany({ orderBy: { number: 'asc' } });
         },
         getTableById: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.table.findUnique({
                 where: { id },
                 include: {
@@ -101,7 +101,7 @@ export const resolvers = {
             });
         },
         orders: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.order.findMany({ include: { table: true, item: true, payment: true } });
         },
         getOrdersByTableId: async (_: any, { tableId }: { tableId: string }) => {
@@ -111,11 +111,11 @@ export const resolvers = {
             });
         },
         payments: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.payment.findMany({ include: { orders: true } });
         },
         getPaymentById: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.payment.findUnique({
                 where: { id: Number(id) },
             });
@@ -127,6 +127,7 @@ export const resolvers = {
             args: { email: string; password: string; name: string, role: Role },
             context: GraphQLContext
         ) => {
+            requireAuth(context, Role.ADMIN);
             const password = await hash(args.password, 10);
 
             const user = await context.prisma.user.create({
@@ -167,7 +168,7 @@ export const resolvers = {
             };
         },
         updateUser: async (parent: unknown, { id, name, email, password, role }: { id: string, name?: string, email?: string, password?: string, role?: Role }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             const data: Record<string, unknown> = {};
             if (name) {
                 data.name = name;
@@ -187,7 +188,7 @@ export const resolvers = {
             });
         },
         deleteUser: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.$transaction(async (prisma) => {
                 // Supprimer les sessions associées à l'utilisateur
                 await prisma.session.deleteMany({
@@ -205,7 +206,7 @@ export const resolvers = {
             return true;
         },
         createItem: async (parent: unknown, { title, description, price, imageUrl }: { title: string, description: string, price: number, imageUrl: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.item.create({
                 data: {
                     title,
@@ -216,13 +217,13 @@ export const resolvers = {
             });
         },
         deleteItem: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.item.delete({
                 where: { id: Number(id) },
             });
         },
         editItem: async (parent: unknown, { id, title, description, price, imageUrl }: { id: string, title?: string, description?: string, price?: number, imageUrl?: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.item.update({
                 where: { id: Number(id) },
                 data: {
@@ -243,13 +244,13 @@ export const resolvers = {
             });
         },
         deleteOrder: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             return prisma.order.delete({
                 where: { id: Number(id) },
             });
         },
         setOrderStatus: async (parent: unknown, { id, status }: { id: string, status: NewOrderStatus }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.USER);
             const order = await prisma.order.findUnique({
                 where: { id: Number(id) }
             })
@@ -280,7 +281,7 @@ export const resolvers = {
             });
         },
         createPaymentForOrder: async (parent: unknown, { type, orderId }: { type: PaymentType, orderId: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             const order = await prisma.order.findUnique({
                 where: { id: Number(orderId) },
             });
@@ -304,7 +305,7 @@ export const resolvers = {
             });
         },
         createPaymentForTable: async (parent: unknown, { tableId, type }: { tableId: string, type: PaymentType }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             const payment = await prisma.payment.create({
                 data: {
                     type: type,
@@ -318,7 +319,7 @@ export const resolvers = {
                 },
             });
 
-            return await prisma.$transaction(
+            return prisma.$transaction(
                 orders.map((order) =>
                     prisma.order.update({
                         where: { id: order.id },
@@ -331,13 +332,13 @@ export const resolvers = {
             );
         },
         deletePayment: async (parent: unknown, { id }: { id: string }, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             return prisma.payment.delete({
                 where: { id: Number(id) },
             });
         },
         addTable: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             const maxNumber = await prisma.table.findFirst({
                 orderBy: { number: 'desc' },
                 select: { number: true },
@@ -352,7 +353,7 @@ export const resolvers = {
             });
         },
         removeTable: async (parent: unknown, args: {}, context: GraphQLContext) => {
-            requireAuth(context);
+            requireAuth(context, Role.ADMIN);
             const maxNumber = await prisma.table.findFirst({
                 orderBy: { number: 'desc' },
                 select: { number: true },
