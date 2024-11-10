@@ -5,7 +5,7 @@ import {TableProps} from "@/utils/interfaces";
 
 export default function TableCard({table} : { table: TableProps }) {
     const localUrl = process.env.LOCAL_URL || 'http://localhost:3000';
-    const productionUrl = process.env.PRODUCTION_URL || 'https://restaurant-app-nu-pearl.vercel.app';
+    const productionUrl = process.env.PRODUCTION_URL || 'https://adrien-morin-sebastian-ruiz-restaurant.vercel.app';
 
     const baseUrl = process.env.NODE_ENV === 'production' ? productionUrl : localUrl;
     const url = `${baseUrl}/menu?tableId=${table.id}`;
