@@ -24,7 +24,7 @@ const FormSchema = z.object({
 });
 
 interface OrderPaymentFormProps {
-    orderId: number;
+    orderId: string;
     refetch: () => void;
 }
 
