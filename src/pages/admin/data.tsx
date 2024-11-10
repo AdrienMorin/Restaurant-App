@@ -1,6 +1,5 @@
 "use client"
 
-import useMiddleware from "@/lib/middleware";
 import AdminLayout from "@/pages/_layout";
 
 import { useQuery } from "@apollo/client";
@@ -10,9 +9,11 @@ import {calculateSalesRanking, transformData} from "@/utils/dataUtils";
 import SalesGraph from "@/molecules/salesGraph";
 import SalesRankingCards from "@/molecules/salesRankingCards";
 import {DailySales, OrderProps, SalesRankingCardsProps} from "@/utils/interfaces";
+import useMiddleware from "@/hooks/useMiddleware";
+import IsLoading from "@/molecules/isLoading";
 
 export default function Data() {
-    useMiddleware();
+    const isConnecting = useMiddleware();
 
     const { data, loading, error } = useQuery(GET_ORDERS_QUERY);
     const [dailySales, setDailySales] = useState<DailySales[]>([]);
@@ -27,6 +28,10 @@ export default function Data() {
             setSalesRanking(calculateSalesRanking(filteredOrders));
         }
     }, [data]);
+
+    if (isConnecting) {
+        return <IsLoading/>;
+    }
 
     return (
         <AdminLayout>

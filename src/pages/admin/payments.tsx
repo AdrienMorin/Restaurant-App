@@ -1,5 +1,4 @@
 import AdminLayout from "@/pages/_layout";
-import useMiddleware from "@/lib/middleware";
 import {
     Select,
     SelectContent,
@@ -11,12 +10,18 @@ import { useQuery } from "@apollo/client";
 import { GET_ALL_TABLES } from "@/utils/graphql/queries/tables";
 import {useState} from "react";
 import PaymentForm from "@/molecules/paymentForm";
+import useMiddleware from "@/hooks/useMiddleware";
+import IsLoading from "@/molecules/isLoading";
 
 export default function PaymentsPage() {
-    useMiddleware();
+    const isConnecting = useMiddleware();
 
     const { data } = useQuery(GET_ALL_TABLES);
     const [selectedTable, setSelectedTable] = useState<string | null>(null);
+
+    if (isConnecting) {
+        return <IsLoading/>;
+    }
 
     return (
         <AdminLayout>

@@ -1,16 +1,17 @@
 "use client"
 
 import AdminLayout from "@/pages/_layout";
-import useMiddleware from "@/lib/middleware";
 import { ItemEditForm } from "@/molecules/itemEditForm";
 import { Button } from "@/components/ui/button";
 import { Undo2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useQuery } from "@apollo/client";
 import {GET_ITEM_BY_ID} from "@/utils/graphql/queries/items";
+import useMiddleware from "@/hooks/useMiddleware";
+import IsLoading from "@/molecules/isLoading";
 
 const EditItemPage: React.FC = () => {
-    useMiddleware();
+    const isConnecting = useMiddleware();
 
     const router = useRouter();
     const { id } = router.query;
@@ -29,6 +30,10 @@ const EditItemPage: React.FC = () => {
     if (error) return <p>Error: {error.message}</p>;
 
     const item = data?.getItemById;
+
+    if (isConnecting) {
+        return <IsLoading/>;
+    }
 
     return (
         <AdminLayout>

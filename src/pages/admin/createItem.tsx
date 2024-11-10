@@ -1,16 +1,17 @@
 "use client"
 
 import AdminLayout from "@/pages/_layout";
-import useMiddleware from "@/lib/middleware";
 import {ItemCreationForm} from "@/molecules/itemCreationForm";
 import {Button} from "@/components/ui/button";
 import {Undo2} from "lucide-react";
 import {useRouter} from "next/router";
+import IsLoading from "@/molecules/isLoading";
+import useMiddleware from "@/hooks/useMiddleware";
 
 
 const CreateItemPage: React.FC = () => {
 
-    useMiddleware();
+    const isConnecting = useMiddleware();
 
     const router = useRouter();
 
@@ -18,6 +19,10 @@ const CreateItemPage: React.FC = () => {
         event.preventDefault();
         router.back();
     };
+
+    if (isConnecting) {
+        return <IsLoading/>;
+    }
 
     return (
         <AdminLayout>

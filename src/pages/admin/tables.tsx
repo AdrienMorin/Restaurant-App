@@ -1,5 +1,4 @@
 import AdminLayout from "@/pages/_layout";
-import useMiddleware from "@/lib/middleware";
 import { useMutation, useQuery } from '@apollo/client';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
@@ -8,9 +7,11 @@ import TableCard from "@/molecules/tableCard";
 import { ADD_TABLE_MUTATION, REMOVE_TABLE_MUTATION } from "@/utils/graphql/mutations/tables";
 import { toast } from "@/hooks/use-toast";
 import {TableProps} from "@/utils/interfaces";
+import useMiddleware from "@/hooks/useMiddleware";
+import IsLoading from "@/molecules/isLoading";
 
 const AdminPage: React.FC = () => {
-    useMiddleware();
+    const isConnecting = useMiddleware();
 
     const { data, refetch } = useQuery(GET_ALL_TABLES);
     const [addTable] = useMutation(ADD_TABLE_MUTATION);
@@ -43,6 +44,10 @@ const AdminPage: React.FC = () => {
             });
         }
     };
+
+    if (isConnecting) {
+        return <IsLoading/>;
+    }
 
     return (
         <AdminLayout>
