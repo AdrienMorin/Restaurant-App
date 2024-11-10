@@ -4,6 +4,12 @@ import {Card} from "@/components/ui/card";
 import {TableProps} from "@/utils/interfaces";
 
 export default function TableCard({table} : { table: TableProps }) {
+    const localUrl = process.env.LOCAL_URL || 'http://localhost:3000';
+    const productionUrl = process.env.PRODUCTION_URL || 'https://restaurant-app-nu-pearl.vercel.app';
+
+    const baseUrl = process.env.NODE_ENV === 'production' ? productionUrl : localUrl;
+    const url = `${baseUrl}/menu?tableId=${table.id}`;
+
     return (
         <Card className={"p-4 my-4 flex items-center justify-center gap-4"}>
             <div>
@@ -11,8 +17,8 @@ export default function TableCard({table} : { table: TableProps }) {
                 <p className={"text-center"}>{table.id}</p>
             </div>
             <div>
-                <Link href={"http://localhost:3000/menu?tableId=" + table.id}>
-                    <QRCodeGenerator url={"http://localhost:3000/menu?tableId=" + table.id}/>
+                <Link href={url}>
+                    <QRCodeGenerator url={url}/>
                 </Link>
             </div>
         </Card>
