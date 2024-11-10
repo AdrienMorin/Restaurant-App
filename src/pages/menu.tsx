@@ -13,6 +13,7 @@ const Menu = () => {
     const { data, loading, error } = useQuery(AllItemsQuery);
     const router = useRouter();
     const { tableId } = router.query;
+    const tableIdString = Array.isArray(tableId) ? tableId[0] : tableId;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -40,13 +41,13 @@ const Menu = () => {
                 </div>
             </div>
             <div className={"w-full fixed bottom-0 flex justify-center"}>
-                {tableId && (
+                {tableIdString && (
                     <Button onClick={toggleSidebar} className={"flex flex-col p-4 h-14 w-80 gap-0 justify-center items-center"}>
                         <ChevronUp className={""}/>
                         <p className={"text-lg"}>Ver las ordenes</p>
                     </Button>
                 )}
-                {isSidebarOpen && tableId && <OrdersSideBar tableId={tableId} onClose={toggleSidebar}/>}
+                {isSidebarOpen && tableIdString && <OrdersSideBar tableId={tableIdString} onClose={toggleSidebar}/>}
             </div>
             <Toaster/>
         </main>

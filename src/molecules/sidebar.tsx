@@ -8,10 +8,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import {useUser} from "@auth0/nextjs-auth0/client";
 import React from "react";
 import {Button} from "@/components/ui/button";
-import Link from "next/link";
 import {useRouter} from "next/router";
 
 interface SidebarItemProps {

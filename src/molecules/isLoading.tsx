@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function IsLoading() {
     return (
         <div className="container relative mt-24 flex-col items-center justify-center lg:max-w-none lg:px-0">

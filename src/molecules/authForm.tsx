@@ -1,4 +1,3 @@
-// src/components/UserAuthForm.tsx
 "use client";
 
 import * as React from "react";
